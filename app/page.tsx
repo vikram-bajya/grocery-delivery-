@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Register from "./register/page";
+import Register from "./registers/page";
 
  function Home() {
   return(
