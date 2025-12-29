@@ -4,12 +4,20 @@ import {
   EyeOff,
   Key,
   Leaf,
+  Loader2Icon,
   Lock,
+  LogIn,
   Mail,
   User,
-} from "lucide-react";
+} 
+from "lucide-react";
 import { motion } from "motion/react";
+import Image from "next/image";
 import React, { useState } from "react";
+import googleImage from "@/assest/google.png";
+import axios from "axios";
+import { tr } from "motion/react-client";
+import { useRouter } from "next/navigation";
 
 type propType = {
   previousStep: (s: number) => void;
@@ -18,8 +26,26 @@ function RegisterForm({ previousStep }: propType) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setpassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
+ const route =useRouter()
+  //for api call and send data from user by get input
+  const handalRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const result = await axios.post("/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+      console.log(result.data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6 py-10 bg-white relative">
       <div
@@ -48,6 +74,7 @@ function RegisterForm({ previousStep }: propType) {
       </p>
 
       <motion.form
+        onSubmit={handalRegister}
         className="flex flex-col gap-5 w-full max-w-sm"
         initial={{
           opacity: 0,
@@ -80,7 +107,7 @@ function RegisterForm({ previousStep }: propType) {
         <div className="relative">
           <Lock className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
           <input
-            type={showPassword ? "text" : "password"}
+            type={showPassword ? "text" : "password"} //logic for show password
             placeholder="Your Password"
             className="w-full border border-gery-300 rounded-2xl py-3 pl-10 pr-4 text-gray-800 focus:ring-2 focus:ring-green-500 focus:outline-none"
             onChange={(e) => setpassword(e.target.value)}
@@ -98,7 +125,44 @@ function RegisterForm({ previousStep }: propType) {
             />
           )}
         </div>
+        {/* inside one or tsx component created */}
+
+        {(() => {
+          const formValidation = name !== "" && email !== "" && password !== "";
+          return (
+            <button
+              disabled={!formValidation || loading}
+              className={`w-full font-semibold py-3 rounded-xl  transition-all
+              duration-200 shadow-md inline-flex items-center justify-center gap-2 ${
+                formValidation
+                  ? "bg-green-600 haver:bg-green-700 text-white"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              {loading ? (
+                <Loader2Icon className="w-5 h-5 animate -spin" />
+              ) : (
+                "Register"
+              )}
+            </button>
+          );
+        })()}
+
+        <div className="flex items-center gap-2 text-gray-400 text-sm mt-2">
+          <span className="flex-1 h-px bg-gray-200"></span>
+          OR
+          <span className="flex-1 h-px bg-gray-200"></span>
+        </div>
+        <button className="w-full flex items-center justify-center gap-3 border border-gray-300 hover:bg-gray-50 py-3 rounded-xl text-gray-700 font-medium transition-all duration-200">
+          <Image src={googleImage} width={20} height={20} alt="google" />
+          continue with Google
+        </button>
       </motion.form>
+
+      <p className=" cursor-pointer text-gray-600 mt-6 text-sm flex items-center gap-1" onClick={()=>route.push("/login")}>
+        Already have an account ? <LogIn className="w-4 h-4" />
+        <span className="text-green-600">Sin in</span>
+      </p>
     </div>
   );
 }

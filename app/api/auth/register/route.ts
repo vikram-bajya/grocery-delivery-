@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const user = await User.create({
       name,
       email,
-      passowrd: hashedPassword,
+      password: hashedPassword,
     });
     return NextResponse.json(user, { status: 200 });
   } catch (error) {

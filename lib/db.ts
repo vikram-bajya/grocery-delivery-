@@ -13,7 +13,7 @@ if (!cached) {
 }
 
 const connectDb = async () => {
-  if (!cached.conn) {
+  if (cached.conn) {
     return cached.conn;
   }
 
