@@ -17,7 +17,10 @@ import React, { FormEvent, useState } from "react";
 import googleImage from "@/assest/google.png"; 
 
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/webauthn";
+// import { signIn } from "next-auth/webauthn";
+
+import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 function Login() { 
   const [email, setEmail] = useState("");
@@ -25,6 +28,10 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter(); 
+
+  const sessions=useSession()
+  console.log(sessions)
+
  const handalLogin=async(e:FormEvent)=>{
     e.preventDefault()
     setLoading(true)
