@@ -1,10 +1,26 @@
 import Image from "next/image";
 import Register from "./registers/page";
+import connectDb from "@/lib/db";
 
- function Home() {
-  return(
-    <Register/>
-  ) 
+import { auth } from "./auth";
+import { redirect } from "next/navigation";
+import User from "@/models/user.model";
+import EditRoleMobile from "@/components/EditRoleMobile";
+
+async function Home() {
+  await connectDb();
+  const session = await auth();
+  const user = await User.findById(session?.user?.id);
+  if (!user) {
+    redirect("/login");
+  }
+
+  const inComplete =
+    !user.mobile || !user.role || (!user.mobile && user.role === "user");
+  if(inComplete){
+    return <EditRoleMobile />
+  }
+  return <div></div>;
 }
 
-export default Home
+export default Home;

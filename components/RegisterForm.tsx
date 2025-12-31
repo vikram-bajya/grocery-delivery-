@@ -9,8 +9,7 @@ import {
   LogIn,
   Mail,
   User,
-} 
-from "lucide-react";
+} from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import React, { useState } from "react";
@@ -18,6 +17,7 @@ import googleImage from "@/assest/google.png";
 import axios from "axios";
 import { tr } from "motion/react-client";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 type propType = {
   previousStep: (s: number) => void;
@@ -28,7 +28,7 @@ function RegisterForm({ previousStep }: propType) {
   const [password, setpassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
- const route =useRouter()
+  const route = useRouter();
   //for api call and send data from user by get input
   const handalRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +39,8 @@ function RegisterForm({ previousStep }: propType) {
         email,
         password,
       });
-      console.log(result.data);
+      // console.log(result.data);
+      route.push("/login");
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -153,13 +154,19 @@ function RegisterForm({ previousStep }: propType) {
           OR
           <span className="flex-1 h-px bg-gray-200"></span>
         </div>
-        <button className="w-full flex items-center justify-center gap-3 border border-gray-300 hover:bg-gray-50 py-3 rounded-xl text-gray-700 font-medium transition-all duration-200">
+        <button
+          className="w-full flex items-center justify-center gap-3 border border-gray-300 hover:bg-gray-50 py-3 rounded-xl text-gray-700 font-medium transition-all duration-200"
+          onClick={() => signIn("google", { callbackUrl: "/" })}
+        >
           <Image src={googleImage} width={20} height={20} alt="google" />
           continue with Google
         </button>
       </motion.form>
 
-      <p className=" cursor-pointer text-gray-600 mt-6 text-sm flex items-center gap-1" onClick={()=>route.push("/login")}>
+      <p
+        className=" cursor-pointer text-gray-600 mt-6 text-sm flex items-center gap-1"
+        onClick={() => route.push("/login")}
+      >
         Already have an account ? <LogIn className="w-4 h-4" />
         <span className="text-green-600">Sin in</span>
       </p>
