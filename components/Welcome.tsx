@@ -22,7 +22,7 @@ function Welcome({ nextStep }: propType) {
         className="flex item-senter gap-3"
       >
         <ShoppingBasket className="w-10 h-10 text-green-600" />
-        <h1 className="text-4x1 md:text-5x1 font-extrabold text-green-700">
+        <h1 className="text-5xl md:text-5x1 font-extrabold text-green-700">
           Snapcart
         </h1>
       </motion.div>

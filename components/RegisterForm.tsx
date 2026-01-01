@@ -66,7 +66,7 @@ function RegisterForm({ previousStep }: propType) {
           y: 0,
         }}
         transition={{ duration: 0.6 }}
-        className="text-4x1 font-extrabold text-green-700 mb-2 "
+        className="text-4xl font-extrabold text-green-700 mb-2 "
       >
         Create Account
       </motion.h1>
