@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Provider from "@/Provider";
-import { auth } from "@/app/auth"; 
+import { auth } from "@/app/auth";
 
 export const metadata: Metadata = {
   title: "Snapcart | 10 minutes grocery delivery App",
@@ -18,10 +18,8 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className="w-full min-h-screen bg-linear-to-b from-green-100 to-white">
-        <Provider session={session}>
-          {children}
-        </Provider>
+      <body className="w-full min-h-screen bg-linear-to-b from-green-10 0 to-white">
+        <Provider session={session}>{children}</Provider>
       </body>
     </html>
   );

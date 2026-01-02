@@ -6,6 +6,7 @@ import { auth } from "./auth";
 import { redirect } from "next/navigation";
 import User from "@/models/user.model";
 import EditRoleMobile from "@/components/EditRoleMobile";
+import Nav from "@/components/nav";
 
 async function Home() {
   await connectDb();
@@ -15,12 +16,16 @@ async function Home() {
     redirect("/login");
   }
 
-  const inComplete =
-    !user.mobile || !user.role || (!user.mobile && user.role === "user");
-  if(inComplete){
-    return <EditRoleMobile />
+  const inComplete = !user.mobile || !user.role;
+  if (inComplete) {
+    return <EditRoleMobile />;
   }
-  return <div></div>;
+  const plainUser = JSON.parse(JSON.stringify(user));
+  return (
+    <>
+      <Nav user={plainUser} />
+    </>
+  );
 }
 
 export default Home;
