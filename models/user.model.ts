@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema<Iuser>(
     },
     image: {
       type: String,
-      },
+    },
   },
   { timestamps: true }
 );

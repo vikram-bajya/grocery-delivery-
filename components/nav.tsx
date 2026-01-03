@@ -65,7 +65,7 @@ function Nav({ user }: { user: Iuser }) {
       </form>
       <div className="flex items-center gap-3 md:gap-6 relative">
         <div
-          className="bg-white ronded-full w-11 h-11 flex items-center justify-center
+          className="bg-white rounded-full w-11 h-11 flex items-center justify-center
       shadow-md hover:scale-105 transistion md:hidden"
           onClick={() => setSearchBarOpen((prev) => !prev)}
         >
@@ -171,15 +171,14 @@ function Nav({ user }: { user: Iuser }) {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                 transition={{ duration: 0.4 }}
-                className="flex tpo-24 left-1/2 -translate-x-1/2 w-[90%] bg:white rounded-full shadow-lg
-                 z-40 flex items-center px-4 py-2"
+                className="flex fixed top-24 left-1/2 -translate-x-1/2 w-[90%] bg-white rounded-full shadow-lg z-40 items-center px-4 py-2"
               >
                 <Search className=" text-gray-500 w-5 h-5 mr-2 " />
                 <form className="grow">
                   <input
                     type="text"
                     placeholder="Search Groceries..."
-                    className="w-full outline-none text-gray-700 bg-transparent"
+                    className="w-full outline-none text-gray-700 "
                   />
                 </form>
                 <button onClick={() => setSearchBarOpen(false)}>

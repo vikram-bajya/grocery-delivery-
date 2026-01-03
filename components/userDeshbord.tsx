@@ -1,11 +1,13 @@
-import React from 'react'
+import React from "react";
+import HeroSection from "./heroSection";
 
-function UserDeshbord() {
+function UserDashboard() {
+ 
   return (
-    <div>
-      
-    </div>
-  )
+    <>
+      <HeroSection />
+    </>
+  );
 }
 
-export default UserDeshbord
+export default UserDashboard;

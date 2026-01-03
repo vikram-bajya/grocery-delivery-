@@ -18,7 +18,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className="w-full min-h-screen bg-linear-to-b from-green-10 0 to-white">
+      <body className="w-full min-h-screen bg-linear-to-b from-green-100 to-white">
         <Provider session={session}>{children}</Provider>
       </body>
     </html>
