@@ -21,13 +21,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials, request) {
         await connectDb();
         const email = credentials.email;
-        const passowrd = credentials.password as string;
+        const password = credentials.password as string;
         const user = await User.findOne({ email });
 
         if (!user) {
           throw new Error("User does not exist");
         }
-        const isMatch = await bcrypt.compare(passowrd, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
           throw new Error("Incorrect password");
         }
@@ -71,13 +71,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       // token ke aunder data dalta h
       if (user) {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
         token.role = user.role;
+      }
+      if (trigger === "update") {
+        token.role = session.role;
       }
       return token;
     },

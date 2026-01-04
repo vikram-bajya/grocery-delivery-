@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 function EditRoleMobile() {
   const router = useRouter();
@@ -16,6 +17,7 @@ function EditRoleMobile() {
   ]);
   const [selectedRole, setSelectedRole] = useState("");
   const [mobile, setMobile] = useState("");
+  const { update } = useSession();
 
   const handleEdit = async () => {
     try {
@@ -23,7 +25,8 @@ function EditRoleMobile() {
         role: selectedRole,
         mobile,
       });
-     router.push("/");
+      await update({ role: selectedRole });
+      router.push("/");
     } catch (error) {
       console.error("Error updating role and mobile:", error);
     }

@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema<Iuser>(
     },
     password: {
       type: String,
-      unique: true,
+      
       required: false,
     },
     mobile: {
