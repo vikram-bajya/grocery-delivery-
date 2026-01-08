@@ -5,7 +5,7 @@ interface Igrocery {
   name: string;
   category: string;
   price: number;
-  unit: number;
+  unit: string;
   image?: string;
   description?: string;
   createdAt?: Date;
@@ -38,9 +38,9 @@ const grocerySchema = new mongoose.Schema<Igrocery>(
       required: true,
     },
     unit: {
-      type: Number,
+      type: String,
       required: true,
-      ennum: ["kg","g", "litre","ml", "piece", "pack"],
+      enum: ["kg","g", "litre","ml", "piece", "pack"],
     },
     image: {
       type: String,

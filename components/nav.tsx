@@ -247,6 +247,7 @@ function Nav({ user }: { user: Iuser }) {
                 src={user.image}
                 alt="user"
                 fill
+                sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover rounded-full"
               />
             ) : (

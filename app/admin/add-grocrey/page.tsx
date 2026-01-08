@@ -1,6 +1,8 @@
 "use client";
-import { ArrowLeft, PlusCircle, Upload } from "lucide-react";
+import axios from "axios";
+import { ArrowLeft, Loader, PlusCircle, Upload } from "lucide-react";
 import { motion } from "motion/react";
+import { image } from "motion/react-client";
 import Image from "next/image";
 import Link from "next/link";
 import React, { ChangeEvent, useState } from "react";
@@ -25,7 +27,8 @@ function AddGrocery() {
   const [unit, setUnit] = useState("");
   const [price, setPrice] = useState("");
   const [preview, setPreview] = useState<string | null>("");
-  const [backendImage, setBackendImage] = useState<File | null>("");
+  const [backendImage, setBackendImage] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -33,7 +36,26 @@ function AddGrocery() {
     setBackendImage(file);
     setPreview(URL.createObjectURL(file));
   };
+  const handelSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("category", category);
+      formData.append("unit", unit);
+      formData.append("price", price);
+      if (backendImage) {
+        formData.append("image", backendImage);
+      }
 
+      const result = await axios.post("/api/admin/add-grocery", formData);
+      console.log("Grocery added successfully:", result);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error adding grocery:", error);
+    }
+  };
   return (
     <div
       className="min-h-screen flex items-center justify-center
@@ -64,7 +86,10 @@ function AddGrocery() {
             Fill out the detials below to add a new grocery item.
           </p>
         </div>
-        <form className="flex flex-col gap-6 w-full animate-fadeIn">
+        <form
+          className="flex flex-col gap-6 w-full animate-fadeIn"
+          onSubmit={handelSubmit}
+        >
           <div>
             <label
               htmlFor="name"
@@ -172,13 +197,20 @@ function AddGrocery() {
             )}
           </div>
           <motion.button
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.02 }}
+            disabled={loading}
             className="mt-4 w-full bg-linear-to-r from-green-500
             to-green-700 text-white font-semibold py-3 rounded-xl shadow-lg
             hover:shadow-xl disabled:opicity-60 transition-all flex
             items-center justify-center gap-2"
-          ></motion.button>
+          >
+            {loading ? (
+              <Loader className="w-5 h-5 animate-spin" />
+            ) : (
+              "Add Grocery"
+            )}
+          </motion.button>
         </form>
       </motion.div>
     </div>

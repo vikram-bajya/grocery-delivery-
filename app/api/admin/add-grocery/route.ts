@@ -9,16 +9,17 @@ export async function POST(req: NextRequest) {
     await connectDb();
     const session = await auth();
     if (!session?.user?.role) {
-      return (
-        NextResponse.json({ message: "You Are Not Adimin" }), { status: 401 }
+      return NextResponse.json(
+        { message: "You Are Not Adimin" },
+        { status: 401 }
       );
     }
     const formData = await req.formData();
-    const name = formData.get("name")?.toString();
-    const file = formData.get("image") as Blob | null;
-    const price = formData.get("price")?.toString();
-    const category = formData.get("category")?.toString();
-    const description = formData.get("description")?.toString();
+    const name = formData.get("name");
+    const file = formData.get("image") as Blob;
+    const price = formData.get("price");
+    const category = formData.get("category");
+    const unit = formData.get("unit");
 
     let imageUrl;
     if (file) {
@@ -28,11 +29,11 @@ export async function POST(req: NextRequest) {
       name,
       price,
       category,
-      description,
-      imageUrl,
+      unit,
+      image: imageUrl,
     });
-    return NextResponse.json(grocery), { status: 200 };
+    return NextResponse.json(grocery, { status: 200 });
   } catch (error) {
-     return NextResponse.json(` add grocery error ${error}`),{status:500};
+    return NextResponse.json(` add grocery error ${error}`, { status: 500 });
   }
 }

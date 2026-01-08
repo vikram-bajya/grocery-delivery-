@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import { promises } from "dns";
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -14,9 +14,10 @@ const uploadOnCloundinary = async (file: Blob): Promise<string | null> => {
     const buffer = Buffer.from(arrayBuffer);
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { resource_type: "auto" },
+        { resource_type: "auto",folder:"grocery-app" },
         (error, result) => {
           if (error) {
+            console.log("cloudinary uploade error::" ,error)
             reject(error);
           } else {
             resolve(result?.secure_url || null);
