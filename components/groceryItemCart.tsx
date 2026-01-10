@@ -1,6 +1,9 @@
+"use client";
+import { PlusCircle, ShoppingCart } from "lucide-react";
 import mongoose from "mongoose";
+import { motion } from "motion/react";
+import Image from "next/image";
 import React from "react";
-
 
 interface Igrocery {
   _id?: mongoose.Types.ObjectId;
@@ -14,8 +17,56 @@ interface Igrocery {
   updatedAt?: Date;
 }
 
-function GroceryItemCart({item}:{item:Igrocery}) {
-  return <div></div>;
+function GroceryItemCart({ item }: { item: Igrocery }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50, scale: 0.9 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: false, amount: 0.5 }}
+      className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300
+      overflow-hidden border border-gray-200 flex flex-col"
+    >
+      <div className="relative w-full aspect-[4/3] bg-gray-50 overflow-hidden group">
+        <Image
+          src={item.image || "/images/placeholder.png"}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+          fill
+          alt="grocery image"
+          className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+        />
+        <div
+          className="absolute inset-0 bg-linear-to-t from-black/20
+        to-transparent opacity-0 group-hover:opacity-100 transiton-all
+        duration-300"
+        />
+      </div>
+      <div>
+        <p className="text-xs text-gray-500 font-medium mb-1 ml-4">
+          {item.category}
+        </p>
+        <h3 className="ml-4">{item.name}</h3>
+        <div className="ml-4 flex items-center justify-between mt-2">
+          <span
+            className=" text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1
+        rounded-full"
+          >
+            {item.unit}
+          </span>
+          <span className="mr-3 text-green-700 font-bold text-lg">
+            ₹{item.price}
+          </span>
+        </div>
+        <motion.button
+          className="w-[90%] mt-4 ml-3 mr-2 flex items-center justify-center gap-2 
+        bg-green-600 hover:bg-green-700 text-white rounded-full py-2 text-sm font-medium transition-all"
+        whileTap={{scale:0.9}}
+        >
+          <ShoppingCart /> Add to Cart
+        </motion.button>
+      </div>
+    </motion.div>
+  );
 }
 
 export default GroceryItemCart;
