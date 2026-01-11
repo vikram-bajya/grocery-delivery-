@@ -6,7 +6,7 @@ import Image from "next/image";
 import React from "react";
 
 interface Igrocery {
-  _id?: mongoose.Types.ObjectId;
+  _id?: string;
   name: string;
   category: string;
   price: number;
@@ -58,9 +58,9 @@ function GroceryItemCart({ item }: { item: Igrocery }) {
           </span>
         </div>
         <motion.button
-          className="w-[90%] mt-4 ml-3 mr-2 flex items-center justify-center gap-2 
+          className="w-[90%] mb-4 mt-4 ml-3 mr-2 flex items-center justify-center gap-2 
         bg-green-600 hover:bg-green-700 text-white rounded-full py-2 text-sm font-medium transition-all"
-        whileTap={{scale:0.9}}
+          whileTap={{ scale: 0.9 }}
         >
           <ShoppingCart /> Add to Cart
         </motion.button>
