@@ -1,10 +1,22 @@
 "use client";
-import { decreaseQuantity } from "@/redux/cartSlice";
+import {
+  decreaseQuantity,
+  increaseQuantity,
+  removeFromCart,
+} from "@/redux/cartSlice";
 import { AppDispatch, RootState } from "@/redux/store";
-import { ArrowLeft, Minus, Plus, ShoppingBasket } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import {
+  ArrowLeft,
+  Minus,
+  Plus,
+  ShoppingBasket,
+  Trash,
+  Trash2,
+} from "lucide-react";
+import { AnimatePresence, motion, removeItem } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -50,8 +62,8 @@ function CartPage() {
           </Link>
         </motion.div>
       ) : (
-        <div>
-          <div className=" grid grid-cols-1 lg:grid-cols-3 gap-8 ">
+        <div className=" grid grid-cols-1 lg:grid-cols-3 gap-8 ">
+          <div className="lg:col-span-2 space-y-5">
             <AnimatePresence>
               {cartData.map((item, index) => (
                 <motion.div
@@ -92,7 +104,9 @@ function CartPage() {
                     <button
                       className="bg-white p-1.5 rounded-full hover:bg-green-100
                     transition-all border border-gray-200"
-                      onClick={() => dispatch(decreaseQuantity(item._id))}
+                      onClick={() =>
+                        dispatch(decreaseQuantity(item._id! || ""))
+                      }
                     >
                       <Minus size={14} className="text-green-700" />
                     </button>
@@ -102,14 +116,33 @@ function CartPage() {
                     <button
                       className="bg-white p-1.5 rounded-full hover:bg-green-100
                     transition-all border border-gray-200"
+                      onClick={() =>
+                        dispatch(increaseQuantity(item._id! || ""))
+                      }
                     >
                       <Plus size={14} className="text-green-700" />
                     </button>
                   </div>
+                  <button
+                    className="mt-3 sm:mt-0 sm:ml-4 text-red-500 hover:text-red-700 transition-colors"
+                    onClick={() => dispatch(removeFromCart(item._id!))}
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white rounded-2xl shadow-xl p-6 h-fit sticky top-24 border border-gray-100 flex flex-col"
+          >
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">
+              Order Summary
+            </h2>
+          </motion.div>
         </div>
       )}
     </div>

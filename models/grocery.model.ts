@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 interface Igrocery {
-  _id?: mongoose.Types.ObjectId;
+  _id?: string;
   name: string;
   category: string;
   price: number;
