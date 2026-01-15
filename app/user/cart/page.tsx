@@ -16,13 +16,17 @@ import {
 import { AnimatePresence, motion, removeItem } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 function CartPage() {
-  const { cartData } = useSelector((state: RootState) => state.cart);
+  const { cartData, subTotal, finalTotal, deliveryFee } = useSelector(
+    (state: RootState) => state.cart
+  );
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
   return (
     <div className="w-[95%] sm:w-[80%] mx-auto mt-8 mb-24 relative">
       <Link
@@ -141,7 +145,37 @@ function CartPage() {
           >
             <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">
               Order Summary
+              <div className="space-y-3 text-gray-700 text-sm sm:text-base">
+                <div className="flex justify-between">
+                  <span>Sub-Total</span>
+                  <span className="text-green-700 font-semibold">
+                    ₹{subTotal}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Deliver Fee</span>
+                  <span className="text-green-700 font-semibold">
+                    ₹{deliveryFee}
+                  </span>
+                </div>
+                <hr className="my-3" />
+                <div className="flex justify-between text-lg sm:text-xl font-bold">
+                  <span>Fonal Total</span>
+                  <span className="text-green-700 font-semibold">
+                    ₹{finalTotal}
+                  </span>
+                </div>
+              </div>
             </h2>
+
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="w-full mt-6 bg-green-600 text-white py-3 rounded-full
+              hover:bg-green-700 transition-all font-semibold text-sm sm:text-base"
+              onClick={() => router.push("/user/checkout")}
+            >
+              Proceed to Checkout
+            </motion.button>
           </motion.div>
         </div>
       )}
