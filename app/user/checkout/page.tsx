@@ -1,14 +1,16 @@
 "use client";
-import MapView from "@/components/MapView";
+import dynamic from "next/dynamic";
 import { RootState } from "@/redux/store";
-import { LatLngExpression } from "leaflet";
 import {
   ArrowLeft,
   Building,
+  CreditCard,
   Home,
+  Loader2Icon,
+  Locate,
+  LocateFixed,
   MapPin,
   Navigation,
-  Navigation2,
   Phone,
   Search,
   User,
@@ -16,64 +18,21 @@ import {
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import { useSelector } from "react-redux";
-import "leaflet/dist/leaflet.css";
-
-import L from "leaflet";
 import axios from "axios";
+import { MapContainer, TileLayer } from "react-leaflet";
+import { LatLngExpression } from "leaflet";
+import { OpenStreetMapProvider } from "leaflet-geosearch";
+import { input } from "motion/react-client";
 
-const icon = L.icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+const CheckoutMap = dynamic(() => import("@/components/CheckoutMap1"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full bg-gray-100 flex items-center justify-center">
+      Loading Map...
+    </div>
+  ),
 });
-
-const customIcon = L.icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-// 2. Define DraggableMarker OUTSIDE the main component
-// Passing position and setter as props
-const DraggableMarker = ({
-  position,
-  setPosition,
-}: {
-  position: LatLngExpression;
-  setPosition: (pos: [number, number]) => void;
-}) => {
-  const map = useMap();
-
-  // Auto-pan map when position changes
-  useEffect(() => {
-    map.setView(position, map.getZoom(), { animate: true });
-  }, [position, map]);
-
-  return (
-    <Marker
-      position={position}
-      draggable={true}
-      icon={customIcon}
-      eventHandlers={{
-        dragend: (e: L.LeafletEvent) => {
-          const marker = e.target as L.Marker;
-          const { lat, lng } = marker.getLatLng();
-          setPosition([lat, lng]);
-        },
-      }}
-    >
-      <Popup>Delivering Here</Popup>
-    </Marker>
-  );
-};
 
 function Checkout() {
   const router = useRouter();
@@ -87,7 +46,11 @@ function Checkout() {
     fullAddress: "",
   });
 
+  const [paymentMethod, setPaymentMEthod] = useState<"cod" | "online">("cod");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [position, setposition] = useState<[number, number] | null>(null);
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -95,13 +58,12 @@ function Checkout() {
           const { latitude, longitude } = pos.coords;
           setposition([latitude, longitude]);
         },
-        (err) => {
-          console.log("Location error:", err);
-        },
+        (err) => console.log("Location error:", err),
         { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 },
       );
     }
   }, []);
+
   useEffect(() => {
     if (userData) {
       setAddress((prev) => ({ ...prev, fullName: userData.name || "" }));
@@ -109,31 +71,58 @@ function Checkout() {
     }
   }, [userData]);
 
+  const handalSearchQuery = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setSearchLoading(true);
+    const provider = new OpenStreetMapProvider();
+    const results = await provider.search({ query: searchQuery });
+    if (results) {
+      setSearchLoading(false);
+      setposition([results[0].y, results[0].x]);
+    }
+  };
+
   useEffect(() => {
     const fetchAddress = async () => {
-      if (!position) return null;
+      if (!position) return;
       try {
         const { data } = await axios.get(
-          `https://nominatim.openstreetmap.org/reverse?lat=${position[0]}&lon=${position[1]}&format:json`,
+          `https://nominatim.openstreetmap.org/reverse?lat=${position[0]}&lon=${position[1]}&format=json`,
         );
-        console.log(data);
-        setAddress((prev) => ({
-          ...prev,
-          city:
-            data.address.city ||
-            data.address.town ||
-            data.address.village ||
-            "",
-          state: data.address.state || "",
-          pincode: data.address.postcode || "",
-          fullAddress: data.display_name || "",
-        }));
+
+        // Ensure address exists in response
+        if (data && data.address) {
+          setAddress((prev) => ({
+            ...prev,
+            city:
+              data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              "",
+            state: data.address.state || "",
+            pincode: data.address.postcode || "",
+            fullAddress: data.display_name || "",
+          }));
+        }
       } catch (error) {
         console.log("api error:", error);
       }
     };
     fetchAddress();
   }, [position]);
+
+  const handalCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setposition([latitude, longitude]);
+        },
+        (err) => console.log("Location error:", err),
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 },
+      );
+    }
+  };
 
   return (
     <div className="w-[92%] md:w-[80%] mx-auto py-10 relative">
@@ -181,7 +170,8 @@ function Checkout() {
                 onChange={(e) =>
                   setAddress((prev) => ({
                     ...prev,
-                    fullName: address.fullName || "",
+
+                    fullName: e.target.value,
                   }))
                 }
                 className="pl-10 w-full border rounded-lg  p-3 text-sm bg-gray-50"
@@ -198,7 +188,7 @@ function Checkout() {
                 onChange={(e) =>
                   setAddress((prev) => ({
                     ...prev,
-                    mobile: address.mobile || "",
+                    mobile: e.target.value,
                   }))
                 }
                 className="pl-10 w-full border rounded-lg  p-3 text-sm bg-gray-50"
@@ -216,7 +206,7 @@ function Checkout() {
                 onChange={(e) =>
                   setAddress((prev) => ({
                     ...prev,
-                    fullAddress: address.fullAddress || "",
+                    fullAddress: e.target.value,
                   }))
                 }
                 className="pl-10 w-full border rounded-lg  p-3 text-sm bg-gray-50"
@@ -235,7 +225,7 @@ function Checkout() {
                   onChange={(e) =>
                     setAddress((prev) => ({
                       ...prev,
-                      city: address.city || "",
+                      city: e.target.value,
                     }))
                   }
                   className="pl-10 w-full border rounded-lg  p-3 text-sm bg-gray-50"
@@ -253,7 +243,7 @@ function Checkout() {
                   onChange={(e) =>
                     setAddress((prev) => ({
                       ...prev,
-                      state: address.state || "",
+                      state: e.target.value,
                     }))
                   }
                   className="pl-10 w-full border rounded-lg  p-3 text-sm bg-gray-50"
@@ -272,7 +262,7 @@ function Checkout() {
                   onChange={(e) =>
                     setAddress((prev) => ({
                       ...prev,
-                      pincode: address.pincode || "",
+                      pincode: e.target.value,
                     }))
                   }
                   className="pl-10 w-full border rounded-lg  p-3 text-sm bg-gray-50"
@@ -285,37 +275,74 @@ function Checkout() {
                 type="text"
                 placeholder="Search City or Area..."
                 className="flex-1 border rounded-lg p-3 text-sm focus:ring-2 focus:ring-green-500"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                }}
               />
               <button
                 className="bg-green-600 text-white px-5 rounded-lg
               hover:bg-green-700 transition-all font-medium"
+                onClick={handalSearchQuery}
               >
-                Search
+                {searchLoading ? (
+                  <Loader2Icon size={16} className="animate-spin" />
+                ) : (
+                  "Search"
+                )}
               </button>
             </div>
             <div
               className="relative mt-6 h-[300px] rounded-xl overflow-hidden 
             border border-gray-200 shadow-inner"
             >
-              {position && (
-                <MapContainer
-                  center={position as LatLngExpression}
-                  zoom={17}
-                  scrollWheelZoom={true}
-                  className="h-[400px] w-full rounded-lg z-0"
-                  style={{ height: "400px", width: "100%" }}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  <DraggableMarker
-                    position={position}
-                    setPosition={setposition}
-                  />
-                </MapContainer>
+              {position ? (
+                <CheckoutMap position={position} setPosition={setposition} />
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  Getting Location...
+                </div>
               )}
+
+              <motion.button
+                whileTap={{ scale: 0.93 }}
+                className="absolute bottom-4 right-4 bg-green-600 text-white shadow-lg
+              rounded-full p-3 hover:bg-green-700 transition-all flex items-center justify-center z-[999]"
+                onClick={handalCurrentLocation}
+              >
+                <LocateFixed size={22} />
+              </motion.button>
             </div>
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.2 }}
+          className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all
+          duration-300 p-6 border border-gray-100 h-fit"
+        >
+          <h2
+            className="text-xl font-semibold text-gray-800 mb-4 flex items-center
+          gap-2 "
+          >
+            {" "}
+            <CreditCard className="text-green-600" /> Payment Method
+          </h2>
+          <div className="space-y-4 mb-6">
+            <button
+              className={`flex items-center gap-3 w-full border rounded-lg p-3
+                transition-all ${
+                  paymentMethod === "online"
+                    ? "border-green-600 bg-green-50 shadow"
+                    : "hover:bg-gray-50"
+                }`}
+            >
+              <CreditCard className="text-green-600" />
+              <span className="font-medium text-gray-700">
+                Pay Online (Stripe)
+              </span>
+            </button>
           </div>
         </motion.div>
       </div>
