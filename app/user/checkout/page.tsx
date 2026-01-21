@@ -13,6 +13,7 @@ import {
   Navigation,
   Phone,
   Search,
+  Truck,
   User,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -24,6 +25,7 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import { LatLngExpression } from "leaflet";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
 import { input } from "motion/react-client";
+import { NextResponse } from "next/server";
 
 const CheckoutMap = dynamic(() => import("@/components/CheckoutMap1"), {
   ssr: false,
@@ -37,6 +39,9 @@ const CheckoutMap = dynamic(() => import("@/components/CheckoutMap1"), {
 function Checkout() {
   const router = useRouter();
   const { userData } = useSelector((state: RootState) => state.user);
+  const { subTotal, deliveryFee, finalTotal, cartData } = useSelector(
+    (state: RootState) => state.cart,
+  );
   const [address, setAddress] = useState({
     fullName: "",
     mobile: "",
@@ -120,6 +125,46 @@ function Checkout() {
         },
         (err) => console.log("Location error:", err),
         { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 },
+      );
+    }
+  };
+
+  const handalCod = async () => {
+    if (!position) {
+      return null;
+    }
+    try {
+      const result = await axios.post("/api/user/order", {
+        userId: userData?._id,
+        items: cartData.map((items) => ({
+          grocery: items._id,
+          quantity: items.quantity,
+
+          name: items.name,
+
+          price: items.price,
+          unit: items.unit,
+          image: items.image,
+        })),
+        totalAmount: finalTotal,
+        address: {
+          fullname: address.fullName,
+          mobile: address.mobile,
+          city: address.city,
+          state: address.state,
+          pincode: address.pincode,
+          fullAddress: address.fullAddress,
+          latitude: position[0],
+          longitude: position[1],
+        },
+        paymentMethod,
+      });
+
+      router.push("/user/order-seccess");
+    } catch (error) {
+      return NextResponse.json(
+        { massage: `error in handelCod ${error}` },
+        { status: 500 },
       );
     }
   };
@@ -337,13 +382,59 @@ function Checkout() {
                     ? "border-green-600 bg-green-50 shadow"
                     : "hover:bg-gray-50"
                 }`}
+              onClick={() => setPaymentMEthod("online")}
             >
               <CreditCard className="text-green-600" />
               <span className="font-medium text-gray-700">
                 Pay Online (Stripe)
               </span>
             </button>
+            <button
+              onClick={() => setPaymentMEthod("cod")}
+              className={`flex items-center gap-3 w-full border rounded-lg p-3
+                transition-all ${
+                  paymentMethod === "cod"
+                    ? "border-green-600 bg-green-50 shadow"
+                    : "hover:bg-gray-50"
+                }`}
+            >
+              <Truck className="text-green-600" />
+              <span className="font-medium text-gray-700">Cash On Deliver</span>
+            </button>
           </div>
+          <div className="border-t pt-4 text-gray-700 space-y-2 text-sm sm:text-base">
+            <div className="flex justify-between">
+              <span className="font-semibold">Subtotal</span>
+              <span className="font-semibold text-green-600"> ₹{subTotal}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-semibold">Delivery Fee</span>
+              <span className="font-semibold text-green-600">
+                ₹{deliveryFee}
+              </span>
+            </div>
+            <div className="flex justify-between font-bold text-lg pt-3 ">
+              <span className="font-semibold">Final Total</span>
+              <span className="font-semibold text-green-600">
+                ₹{finalTotal}
+              </span>
+            </div>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.93 }}
+            className=" w-full mt-6 bg-green-600 text-white py-3 rounded-full
+          hover:bg-green-700 transition-all font-semibold"
+            onClick={() => {
+              if (paymentMethod == "cod") {
+                handalCod();
+              } else {
+                // handleOnlineOrder()
+                null;
+              }
+            }}
+          >
+            {paymentMethod == "cod" ? "Place Order" : "Pay & Place Order"}
+          </motion.button>
         </motion.div>
       </div>
     </div>
