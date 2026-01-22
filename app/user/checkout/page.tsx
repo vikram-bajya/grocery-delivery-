@@ -168,6 +168,41 @@ function Checkout() {
       );
     }
   };
+  const handleOnlinePayment = async () => {
+    if (!position) {
+      return null;
+    }
+    try {
+      const result = await axios.post("/api/user/payment", {
+        userId: userData?._id,
+        items: cartData.map((items) => ({
+          grocery: items._id,
+          quantity: items.quantity,
+
+          name: items.name,
+
+          price: items.price,
+          unit: items.unit,
+          image: items.image,
+        })),
+        totalAmount: finalTotal,
+        address: {
+          fullname: address.fullName,
+          mobile: address.mobile,
+          city: address.city,
+          state: address.state,
+          pincode: address.pincode,
+          fullAddress: address.fullAddress,
+          latitude: position[0],
+          longitude: position[1],
+        },
+        paymentMethod,
+      });
+      window.location.href = result.data.url;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="w-[92%] md:w-[80%] mx-auto py-10 relative">
@@ -428,8 +463,7 @@ function Checkout() {
               if (paymentMethod == "cod") {
                 handalCod();
               } else {
-                // handleOnlineOrder()
-                null;
+                handleOnlinePayment();
               }
             }}
           >

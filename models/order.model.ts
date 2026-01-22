@@ -3,17 +3,15 @@ import mongoose from "mongoose";
 interface Iorder {
   _id?: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
-  items: [
-    {
-      grocery: mongoose.Types.ObjectId;
-      quantity: number,
-        name: string,
-        unit: string,
-
-        price: number,
-        image: string,
-    },
-  ];
+  items: {
+    grocery: mongoose.Types.ObjectId;
+    quantity: number;
+    name: string;
+    unit: string;
+    price: number;
+    image: string;
+  }[];
+  isPaid:boolean;
   totalAmount: number;
   paymentMethod: "cod" | "online";
   address: {
@@ -24,7 +22,7 @@ interface Iorder {
     pincode: string;
     fullAddress: string;
     latitude: string;
-   longitude: string;
+    longitude: string;
   };
   status: "pending" | "out of deliver" | "delivered";
   createdAt?: Date;
@@ -39,16 +37,23 @@ const orderSchema = new mongoose.Schema<Iorder>(
       required: true,
     },
     items: [
-      { type: mongoose.Schema.ObjectId, ref: "Grocery", required: true },
       {
-        quantity: Number,
-        name: String,
+        grocery: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Grocery",
+          required: true,
+        },
+        quantity: { type: Number, required: true },
+        name: { type: String, required: true },
         unit: String,
-
-        price: Number,
+        price: { type: Number, required: true },
         image: String,
       },
     ],
+    isPaid:{
+      type:Boolean,
+      default:false
+    },
     paymentMethod: {
       type: String,
       enum: ["cod", "online"],

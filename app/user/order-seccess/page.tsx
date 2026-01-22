@@ -1,10 +1,13 @@
 "use client";
-import { CheckCircle, Package } from "lucide-react";
+import { ArrowRight, CheckCircle, Package } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import React from "react";
 
 function OrderSeccess() {
+
+
+ 
   return (
     <div
       className="flex flex-col items-center justify-center min-h-[80vh]
@@ -49,17 +52,65 @@ function OrderSeccess() {
         <span className="font-semibold text-green-700">My Orders</span> section
       </motion.p>
       <motion.div
-      initial={{y:40,opacity:0}}
-      animate={{ y: [0, -10, 3], opacity: 1 }}
-          transition={{delay:1, repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          className="mt-10"
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: [0, -10, 3], opacity: 1 }}
+        transition={{
+          delay: 1,
+          repeat: Infinity,
+          duration: 2,
+          ease: "easeInOut",
+        }}
+        className="mt-10"
       >
-        <Package className="w-16 h-16 md:h-20 text-green-500"/>
+        <Package className="w-16 h-16 md:h-20 text-green-500" />
       </motion.div>
-      <motion.div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1.2, duration: 0.4 }}
+        className="mt-12"
+      >
         <Link href={"/user/my-order"}>
-        
+          <motion.div
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.93 }}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700
+        text-white text-base font-semibold px-8 rounded-full shadow-lg transition-all"
+          >
+            Go to My Order <ArrowRight />
+          </motion.div>
         </Link>
+      </motion.div>
+      <motion.div
+      initial={{opacity:0}}
+        animate={{ opacity: [0.4, 0.6, 0.4] }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute top-0 left-0 w-full h-full pointer-events-none"
+      >
+        <div
+          className="absolute top-20 left-[10%] w-2 h-2 bg-green-400 rounded-full
+        animate-bounce"
+        />
+        <div
+          className="absolute top-32 left-[30%] w-2 h-2 bg-green-400 rounded-full
+        animate-bounce"
+        />
+        <div
+          className="absolute top-24 left-[60%] w-2 h-2 bg-green-400 rounded-full
+        animate-bounce"
+        />
+        <div
+          className="absolute top-16 left-[80%] w-2 h-2 bg-green-400 rounded-full
+        animate-bounce"
+        />
+        <div
+          className="absolute top-20 left-[90%] w-2 h-2 bg-green-400 rounded-full
+        animate-bounce"
+        />
       </motion.div>
     </div>
   );
