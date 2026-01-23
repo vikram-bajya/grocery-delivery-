@@ -296,7 +296,7 @@ function Nav({ user }: { user: Iuser }) {
                 {user.role == "user" && (
                   <>
                     <Link
-                      href={""}
+                      href={"/user/my-orders"}
                       className="flex items-center gap-2 px-3 hover:bg-green-100 rounded-lg
                 text-gray-700 font-medium"
                       onClick={() => setOpen(false)}

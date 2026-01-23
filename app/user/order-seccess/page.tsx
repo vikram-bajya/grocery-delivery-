@@ -70,7 +70,7 @@ function OrderSeccess() {
         transition={{ delay: 1.2, duration: 0.4 }}
         className="mt-12"
       >
-        <Link href={"/user/my-order"}>
+        <Link href={"/user/my-orders"}>
           <motion.div
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.93 }}

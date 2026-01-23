@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface Iorder {
+export interface Iorder {
   _id?: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   items: {
@@ -11,7 +11,7 @@ interface Iorder {
     price: number;
     image: string;
   }[];
-  isPaid:boolean;
+  isPaid: boolean;
   totalAmount: number;
   paymentMethod: "cod" | "online";
   address: {
@@ -50,10 +50,11 @@ const orderSchema = new mongoose.Schema<Iorder>(
         image: String,
       },
     ],
-    isPaid:{
-      type:Boolean,
-      default:false
+    isPaid: {
+      type: Boolean,
+      default: false,
     },
+
     paymentMethod: {
       type: String,
       enum: ["cod", "online"],
