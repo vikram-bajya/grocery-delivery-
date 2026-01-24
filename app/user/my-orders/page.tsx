@@ -1,7 +1,9 @@
 "use client";
+import UserOrderCart from "@/components/userOrderCart";
 import { Iorder } from "@/models/order.model";
 import axios from "axios";
 import { ArrowLeft, Package, PackageSearch } from "lucide-react";
+import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -55,7 +57,18 @@ function Myorder() {
           <PackageSearch className="text-green-600" size={70}/>
           <h2 className="text-xl font semibold text-gray-700">No Orders Found</h2>
           <p className="text-gray-500 text-sm mt-1">Start shopping to view your order here.</p>
-        </div> : <div></div>}
+        </div> : <div className="mt-4 space-y-6">
+          {order?.map((order,index)=>(
+            <motion.div
+            key={index}
+            initial={{opacity:0,y:20}}
+            animate={{opacity:1,y:0}}
+            transition={{duration:0.4}}
+            >
+              <UserOrderCart order={order}/>
+            </motion.div>
+          ))}
+          </div>}
       </div>
     </div>
   );
