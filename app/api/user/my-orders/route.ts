@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     const orders = await Order.find({ user: session?.user?.id }).populate(
       "user",
     );
+  
 
     if (!orders) {
       return NextResponse.json({ massage: "Order not found" }, { status: 400 });

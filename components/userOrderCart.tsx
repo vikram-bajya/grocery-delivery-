@@ -1,19 +1,30 @@
 "use client";
 import { Iorder } from "@/models/order.model";
+import {
+  ChevronDown,
+  ChevronUp,
+  CreditCard,
+  MapPin,
+  Package,
+  Truck,
+  TruckIcon,
+} from "lucide-react";
 import { motion } from "motion/react";
-import React from "react";
+import Image from "next/image";
+import React, { useState } from "react";
 
 function UserOrderCart({ order }: { order: Iorder }) {
+  const [expanded, setExpanded] = useState(false);
   const getStatus = (status: string) => {
     switch (status) {
-      case "paending":
+      case "pending":
         return "bg-yellow-100 text-yellow-700 border-yellow-300";
-      case "out of deliovery":
+      case "out of delivery":
         return "bg-blue-100 text-blue-700 border-blue-300";
       case "delivered":
         return "bg-green-100 text-green-700 border-green-300";
       default:
-        return
+        return;
         "bg-gray-100 text-gray-600 border-gray-300";
     }
   };
@@ -32,7 +43,6 @@ function UserOrderCart({ order }: { order: Iorder }) {
         {/* border id or date */}
         <div className="">
           <h3 className="text-lg font-semibold text-gray-800">
-            order{" "}
             <span className="text-green-700 font-bold">
               #{order?._id?.toString().slice(-6)}
             </span>
@@ -52,7 +62,105 @@ function UserOrderCart({ order }: { order: Iorder }) {
           >
             {order.isPaid ? "Paid" : "Unpaid"}
           </span>
-          <span className=""></span>
+          <span
+            className={`px-3 py-1 text-xs font-semibold border rounded-full
+            ${getStatus(order.status)}`}
+          >
+            {order.status}
+          </span>
+        </div>
+      </div>
+      <div className="p-5 space-y-4">
+        {order.paymentMethod == "cod" ? (
+          <div className="flex items-center gap-2 text-gray-700 text-sm">
+            <Truck size={16} className="text-green-600" />
+            Cash On Delivery
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-gray-700 text-sm">
+            <CreditCard size={16} className="text-green-600" />
+            Online Payment
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 text-gray-700 text-sm">
+          <MapPin size={16} className="text-green-600" />
+          <span className="truncate">{order.address.fullAddress}</span>
+        </div>
+
+        <div className="border-t border-gray-200 pt-3">
+          <button
+            onClick={() => setExpanded((prev) => !prev)}
+            className="w-full flex justify-between items-center text-sm font-medium
+            text-gray-700 hover:text-green-700 transition"
+          >
+            <span className="flex items-center gap-2">
+              <Package size={16} className="etxt-green-600" />
+              {expanded
+                ? "Hide Order Items"
+                : `View ${order.items.length} Items`}
+            </span>
+            {expanded ? (
+              <ChevronUp size={16} className="etxt-green-600" />
+            ) : (
+              <ChevronDown size={16} className="etxt-green-600" />
+            )}
+          </button>
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{
+              height: expanded ? "auto" : 0,
+              opacity: expanded ? 1 : 0,
+            }}
+            className="overflow-hidden"
+          >
+            <div className="mt-3 space-y-3">
+              {order.items.map((item, index) => (
+                <div
+                  className="flex justify-between items-center bg-gray-50 rounded-xl
+                px-3 py-2 hover:bg-gray-100 transition"
+                >
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      width={48}
+                      height={48}
+                      className="rounded-lg object-cover border border-gary-200"
+                    />
+                    <p className="text-sm font-semibold text-grsy-800">
+                      {item.name}
+                    </p>
+                    <p className="text-sm font-semibold text-grsy-800">
+                      {item.quantity}×{item.unit}
+                    </p>
+                  </div>
+
+                  <p className="text-sm font-semibold text-grsy-800">
+                    ₹{Number(item.price * item.quantity)}
+                  </p>
+                </div>
+              ))}
+
+              <div className="border-t pt-3 flex justify-between items-center text-sm font-semibold text-gray-800">
+                <div className="flex items-center gap-2 text-gray-700 text-sm">
+                  <TruckIcon size={16} className="text-green-600" />
+                  <span>
+                    Delivery:
+                    <span className="text-green-700 font-semibold">
+                      {order.status}
+                    </span>
+                  </span>
+                </div>
+                <div>
+                  Total:
+                  <span className="text-green-700 font-bold">
+                    ₹{order.totalAmount}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </motion.div>

@@ -8,14 +8,14 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 function Myorder() {
-  const [order, setOrder] = useState<Iorder[]>();
+  const [orders, setOrders] = useState<Iorder[]>();
   const [loading, setLoading] = useState(true);
   const route = useRouter();
   useEffect(() => {
     const getMyOrder = async () => {
       try {
         const result = await axios.get("/api/user/my-orders");
-        setOrder(result.data);
+        setOrders(result.data);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -53,12 +53,12 @@ function Myorder() {
           </div>
         </div>
 
-        {order?.length == 0 ? <div className="pt-20 flex flex-col items-center text-center">
+        {orders?.length == 0 ? <div className="pt-20 flex flex-col items-center text-center">
           <PackageSearch className="text-green-600" size={70}/>
           <h2 className="text-xl font semibold text-gray-700">No Orders Found</h2>
           <p className="text-gray-500 text-sm mt-1">Start shopping to view your order here.</p>
         </div> : <div className="mt-4 space-y-6">
-          {order?.map((order,index)=>(
+          {orders?.map((order,index)=>(
             <motion.div
             key={index}
             initial={{opacity:0,y:20}}

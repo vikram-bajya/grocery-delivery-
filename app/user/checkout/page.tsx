@@ -148,7 +148,7 @@ function Checkout() {
         })),
         totalAmount: finalTotal,
         address: {
-          fullname: address.fullName,
+          fullName: address.fullName,
           mobile: address.mobile,
           city: address.city,
           state: address.state,
@@ -187,7 +187,7 @@ function Checkout() {
         })),
         totalAmount: finalTotal,
         address: {
-          fullname: address.fullName,
+          fullName: address.fullName,
           mobile: address.mobile,
           city: address.city,
           state: address.state,
