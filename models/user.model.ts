@@ -8,6 +8,17 @@ interface Iuser {
   mobile?: string;
   role: "user" | "deliveryBoy" | "admin";
   image?: string;
+  loaction?: {
+    type: {
+      type: StringConstructor;
+      enum: string[];
+      default: string;
+    };
+    coordinates: {
+      type: number[];
+      default: number[];
+    };
+  };
 }
 
 const userSchema = new mongoose.Schema<Iuser>(
@@ -23,7 +34,7 @@ const userSchema = new mongoose.Schema<Iuser>(
     },
     password: {
       type: String,
-      
+
       required: false,
     },
     mobile: {
@@ -38,9 +49,23 @@ const userSchema = new mongoose.Schema<Iuser>(
     image: {
       type: String,
     },
+    //gioJson formate me h
+    loaction: {
+      type: {
+        type: String,
+        enum: ["point"],
+        default: "point",
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0],
+        //first longitude fir  latitude
+      },
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
+userSchema.index({ loaction: "2dsphere" });
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 export default User;
