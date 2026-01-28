@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { Server } from "socket.io";
 import { Socket } from "dgram";
 import axios from "axios";
+import { type } from "os";
 
 dotenv.config();
 
@@ -12,25 +13,36 @@ const server = http.createServer(app);
 
 const port = process.env.PORT || 5000;
 
-// ... imports
+const io = new Server(server, {
+  cors: {
+    origin: process.env.NEXT_BASE_URL,
+  },
+});
 
 io.on("connection", (socket) => {
-  console.log("user connect:", socket.id);
-
   socket.on("identity", async (userId) => {
-    console.log("User ID received:", userId);
+    await axios.post(`${process.env.NEXT_BASE_URL}/api/socket/connect`, {
+      userId,
+      socketId: socket.id,
+    });
 
-    try {
-      await axios.post(`${process.env.NEXT_BASE_URL}/api/socket/connect`, {
-        userId,
-        socketId: socket.id,
-        secret: process.env.SOCKET_SECRET || "my_secure_secret_123", // 👈 Add this
-      });
-      console.log("Updated socket ID in DB");
-    } catch (err) {
-      console.error("Error updating socket ID:", err.message);
-    }
+    socket.on("update-location", async({ userId, latitude, longitude }) => {
+      const location={
+        type:"Point",
+        coordinates:[longitude ,latitude]
+      }
+      await axios.post(`${process.env.NEXT_BASE_URL}/api/socket/update-location`, {
+      userId,
+      location,
+    });
+    });
+
+    socket.on("disconnect", () => {
+      console.log("user Disconnect", socket.id);
+    });
   });
+});
 
-  // ... rest of code
+server.listen(port, () => {
+  console.log("server started at", port);
 });
