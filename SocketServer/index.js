@@ -9,6 +9,7 @@ import { type } from "os";
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 const server = http.createServer(app);
 
 const port = process.env.PORT || 5000;
@@ -26,21 +27,34 @@ io.on("connection", (socket) => {
       socketId: socket.id,
     });
 
-    socket.on("update-location", async({ userId, latitude, longitude }) => {
-      const location={
-        type:"Point",
-        coordinates:[longitude ,latitude]
-      }
-      await axios.post(`${process.env.NEXT_BASE_URL}/api/socket/update-location`, {
-      userId,
-      location,
-    });
+    socket.on("update-location", async ({ userId, latitude, longitude }) => {
+      const location = {
+        type: "Point",
+        coordinates: [longitude, latitude],
+      };
+      await axios.post(
+        `${process.env.NEXT_BASE_URL}/api/socket/update-location`,
+        {
+          userId,
+          location,
+        },
+      );
     });
 
     socket.on("disconnect", () => {
       console.log("user Disconnect", socket.id);
     });
   });
+});
+
+app.post("/notify", (req, res) => {
+  const {  event, data,socketId} = req.body;
+  if (socketId) {
+    io.to(socketId).emit(event, data);
+  } else {
+    io.emit(event, data);
+  }
+  return res.status(200).json({ success: true });
 });
 
 server.listen(port, () => {
